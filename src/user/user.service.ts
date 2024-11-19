@@ -38,8 +38,6 @@ export class UserService {
       name: userInfo.name,
     });
 
-    console.log(tokens);
-
     return {
       ...tokens,
       name: user.name,
