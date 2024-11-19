@@ -1,37 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-oauth2';
-import { ConfigService } from '@nestjs/config';
+import { Strategy } from 'passport-http-bearer';
+// import { ConfigService } from '@nestjs/config';
 import { IdpService } from 'src/idp/idp.service';
 import { UserService } from '../user.service';
 
 @Injectable()
 export class IdpStrategy extends PassportStrategy(Strategy, 'idp') {
   constructor(
-    private readonly configService: ConfigService,
+    // private readonly configService: ConfigService,
     private idpService: IdpService,
     private userService: UserService,
   ) {
-    super({
-      authorizationURL: 'https://idp.gistory.me/authorize',
-      tokenURL: 'https://api.idp.gistory.me/api/oauth2/token',
-      clientID: configService.get<string>('IDP_CLIENT_ID'),
-      clientSecret: configService.get<string>('IDP_CLIENT_SECRET'),
-      callbackURL: configService.get<string>('IDP_CALLBACK_URL'),
-      scope: ['openid', 'profile'],
-    });
+    super();
   }
 
   async validate(accessToken: string): Promise<any> {
-    const idpInfo = await this.idpService.getUserInfo(accessToken);
+    const idpUserInfo = await this.idpService
+      .getUserInfo(accessToken)
+      .catch(() => {
+        throw new UnauthorizedException();
+      });
 
-    const findIt = await this.userService.findUserOrCreate({
-      uuid: idpInfo.uuid,
-      name: idpInfo.name,
-    });
+    console.log('idpInfo');
+    console.log(idpUserInfo);
+
+    const findIt = await this.userService
+      .findUserOrCreate({
+        uuid: idpUserInfo.uuid,
+        name: idpUserInfo.name,
+      })
+      .catch(() => {
+        throw new UnauthorizedException();
+      });
 
     return {
-      idpInfo,
+      idpUserInfo,
       findIt,
       accessToken,
     };
