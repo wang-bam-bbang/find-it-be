@@ -15,6 +15,19 @@ export class UserService {
     private userRepository: UserRepository,
   ) {}
 
+  async getIdpLoginUrl(): Promise<string> {
+    const idpUrl = 'https://idp.gistory.me';
+    const clientId = this.configService.get<string>('IDP_CLIENT_ID');
+    const redirectUrl = this.configService.get<string>('IDP_CALLBACK_URL');
+    const responseType = 'code';
+    const scope = 'openid profile offline_access';
+    const state = this.configService.get<string>('IDP_STATE');
+
+    const idpLoginUrl = `${idpUrl}/authorize?response_type=${responseType}&client_id=${clientId}&redirect_uri=${redirectUrl}&scope=${scope}&state=${state}&prompt=consent`;
+
+    return idpLoginUrl;
+  }
+
   async login(code: string) {
     const tokens = await this.idpService.getAccessToken(code);
 
@@ -24,6 +37,8 @@ export class UserService {
       uuid: userInfo.uuid,
       name: userInfo.name,
     });
+
+    console.log(tokens);
 
     return {
       ...tokens,

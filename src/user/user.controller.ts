@@ -1,29 +1,27 @@
 import { Controller, Get, UseGuards, Res, Query } from '@nestjs/common';
 
-import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { UserService } from './user.service';
 import { IdPGuard } from './guard/idp.guard';
 import { GetUser } from './decorator/get-user.decorator';
 import { User } from '@prisma/client';
-import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user')
 export class UserController {
-  constructor(
-    private userService: UserService,
-    private configService: ConfigService,
-  ) {}
+  constructor(private userService: UserService) {}
 
   @Get('login')
-  @UseGuards(AuthGuard('idp'))
-  async loginByIdP() {}
+  async loginByIdP(@Res() res: Response) {
+    const idpLoginUrl = await this.userService.getIdpLoginUrl();
+
+    return res.redirect(idpLoginUrl);
+  }
 
   @Get('callback')
   async idpAuthCallback(@Query() { code }, @Res() res: Response) {
-    console.log(code);
     const { access_token, refresh_token, name } =
       await this.userService.login(code);
+
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
       sameSite: 'none',
