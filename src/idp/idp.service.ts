@@ -30,13 +30,12 @@ export class IdpService {
     const tokenResponse = await firstValueFrom(
       this.httpService
         .post<IdpJwtResponse>(
-          this.idpUrl + '/oauth2/token',
-          // this.idpUrl + '/oauth/token',
+          this.idpUrl + '/oauth/token',
           {
             grant_type: 'authorization_code',
             code,
             redirect_uri: this.configService.get<string>('IDP_CALLBACK_URL'),
-            scope: 'openid profile',
+            scope: 'openid profile offline_access',
           },
           {
             headers: {
@@ -58,6 +57,7 @@ export class IdpService {
           }),
         ),
     );
+
     return tokenResponse.data;
   }
   /**
@@ -68,13 +68,14 @@ export class IdpService {
   async getUserInfo(accessToken: string): Promise<UserInfo> {
     const userInfoResponse = await firstValueFrom(
       this.httpService
-        .get<IdpUserInfoResponse>(this.idpUrl + '/userinfo', {
+        .get<IdpUserInfoResponse>(this.idpUrl + '/oauth/userinfo', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         })
         .pipe(
           catchError((error: AxiosError) => {
+            console.log('Error details:', error.response?.data);
             if (error instanceof AxiosError && error.response?.status === 401) {
               throw new UnauthorizedException();
             }
@@ -83,8 +84,8 @@ export class IdpService {
         ),
     );
 
-    const { uuid, name, email } = userInfoResponse.data;
-    return { uuid, name, email };
+    const { uuid, name } = userInfoResponse.data;
+    return { uuid, name };
   }
 
   async refresh(refreshToken: string): Promise<IdpJwtResponse> {
