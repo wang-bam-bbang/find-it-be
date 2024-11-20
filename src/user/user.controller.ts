@@ -5,6 +5,7 @@ import { UserService } from './user.service';
 import { IdPGuard } from './guard/idp.guard';
 import { GetUser } from './decorator/get-user.decorator';
 import { User } from '@prisma/client';
+import { UserInfoResDto } from './dto/res/userInfoRes.dto';
 
 @Controller('user')
 export class UserController {
@@ -36,7 +37,7 @@ export class UserController {
 
   @Get('info')
   @UseGuards(IdPGuard)
-  async getUserInfo(@GetUser() user: User) {
+  async getUserInfo(@GetUser() user: User): Promise<UserInfoResDto> {
     return user;
   }
 }
