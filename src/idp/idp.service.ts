@@ -23,8 +23,7 @@ export class IdpService {
   /**
    * this method is used to get the aceess and refresh tokens from the gsa idp
    * @param code code passed by the user, from the idp
-   * @param redirectUrl redirect url used to get the code
-   * @returns accessToken and refreshTokenthis.configService.get<string>('IDP_CALLBACK_URL'),
+   * @returns accessToken and refreshToken
    */
   async getAccessToken(code: string): Promise<IdpJwtResponse> {
     const tokenResponse = await firstValueFrom(
@@ -63,7 +62,7 @@ export class IdpService {
   /**
    * this method is used to get the user info from the idp
    * @param accessToken idp access_token passed by user
-   * @returns user information (uuid, name, email)
+   * @returns user information (uuid, name)
    */
   async getUserInfo(accessToken: string): Promise<UserInfo> {
     const userInfoResponse = await firstValueFrom(
@@ -102,8 +101,8 @@ export class IdpService {
               'Content-Type': 'application/x-www-form-urlencoded',
             },
             auth: {
-              username: process.env.IDP_CLIENT_ID,
-              password: process.env.IDP_CLIENT_SECRET,
+              username: this.configService.get<string>('IDP_CLIENT_ID'),
+              password: this.configService.get<string>('IDP_CLIENT_SECRET'),
             },
           },
         )
