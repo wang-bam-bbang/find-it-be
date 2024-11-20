@@ -12,3 +12,87 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  uuid  String @id @db.Uuid
+  name  String
+  posts Post[] // post uuid list
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ItemCategory {
+  ELECTRONICS
+  CARD
+  CLOTHING
+  BAG
+  WALLET
+  ACCESSORIES
+  DOCUMENT
+  OTHER
+}
+
+enum PostStatus {
+  IN_PROGRESS
+  RESOLVED
+  CANCELLED
+}
+
+enum PostType {
+  FOUND
+  LOST
+}
+
+model Post {
+  id          String       @id @default(uuid()) @db.Uuid
+  type        PostType
+  title       String       @db.VarChar(255)
+  description String       @db.Text
+  images      String[] // image url list
+  location    Json // location Json 구성 추후 논의=
+  category    ItemCategory
+  status      PostStatus
+  author      User         @relation(fields: [authorId], references: [uuid])
+  authorId    String       @db.Uuid
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+
+  @@index([authorId])
+}
+
+// // 추가 features가 있을 수 있어서 Found와 Lost를 분리함
+// // 발견 게시글
+// model FoundPost {
+//   id          String       @id @default(uuid()) @db.Uuid
+//   title       String
+//   description String
+//   images      String[] // image url list
+//   location    String
+//   category    ItemCategory
+//   status      PostStatus   @default(IN_PROGRESS)
+//   author      User         @relation(fields: [authorId], references: [uuid])
+//   authorId    String       @db.Uuid
+//   createdAt   DateTime     @default(now())
+//   updatedAt   DateTime     @updatedAt
+
+//   @@index([authorId])
+// }
+
+// // 분실 게시글
+// model LostPost {
+//   id          String       @id @default(uuid()) @db.Uuid
+//   title       String
+//   description String
+//   images      String[] // image url list
+//   location    String
+//   category    ItemCategory
+//   status      PostStatus   @default(IN_PROGRESS)
+//   author      User         @relation(fields: [authorId], references: [uuid])
+//   authorId    String       @db.Uuid
+//   createdAt   DateTime     @default(now())
+//   updatedAt   DateTime     @updatedAt
+
+//   @@index([authorId])
+// }
