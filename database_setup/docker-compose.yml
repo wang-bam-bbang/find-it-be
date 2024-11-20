@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   postgres:
     container_name: postgres_db
@@ -8,8 +7,20 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: postgres
+      POSTGRES_DB: shadow
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  postgres_shadow:
+    container_name: postgres_shadow_db
+    image: postgres:latest
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: shadow
+    volumes:
+      - postgres_shadow_data:/var/lib/postgresql/data
 volumes:
   postgres_data:
+  postgres_shadow_data:
