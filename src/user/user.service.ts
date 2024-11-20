@@ -5,11 +5,13 @@ import { IdpService } from 'src/idp/idp.service';
 import { UserRepository } from './user.repository';
 import { JwtTokenType } from './types/jwtToken.type';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { LoginCallbackDto } from './dto/req/callBack.dto';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UserService {
   constructor(
-    private readonly configService: ConfigService,
+    private configService: ConfigService,
     private prismaService: PrismaService,
     private idpService: IdpService,
     private userRepository: UserRepository,
@@ -28,19 +30,11 @@ export class UserService {
     return idpLoginUrl;
   }
 
-  async login(code: string) {
+  async login({ code }: LoginCallbackDto) {
     const tokens = await this.idpService.getAccessToken(code);
-
-    const userInfo = await this.idpService.getUserInfo(tokens.access_token);
-
-    const user = await this.userRepository.findUserOrCreate({
-      uuid: userInfo.uuid,
-      name: userInfo.name,
-    });
 
     return {
       ...tokens,
-      name: user.name,
     };
   }
 
@@ -51,7 +45,10 @@ export class UserService {
     };
   }
 
-  async findUserOrCreate({ uuid, name }) {
+  async findUserOrCreate({
+    uuid,
+    name,
+  }: Pick<User, 'uuid' | 'name'>): Promise<User> {
     const user = await this.prismaService.user.findUnique({
       where: { uuid },
     });
