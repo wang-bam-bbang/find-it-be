@@ -18,13 +18,17 @@ export class UserService {
   ) {}
 
   async getIdpLoginUrl(): Promise<string> {
-    const idpUrl = 'https://idp.gistory.me';
-    const clientId = this.configService.get<string>('IDP_CLIENT_ID');
-    const redirectUrl = this.configService.get<string>('IDP_CALLBACK_URL');
-    const responseType = 'code';
-    const scope = 'openid profile offline_access';
+    const idpWebUrl = 'https://idp.gistory.me';
 
-    const idpLoginUrl = `${idpUrl}/authorize?response_type=${responseType}&client_id=${clientId}&redirect_uri=${redirectUrl}&scope=${scope}&prompt=consent`;
+    const params = new URLSearchParams({
+      response_type: 'code',
+      client_id: this.configService.get<string>('IDP_CLIENT_ID'),
+      redirect_uri: this.configService.get<string>('IDP_CALLBACK_URL'),
+      scope: 'openid profile offline_access',
+      prompt: 'consent',
+    });
+
+    const idpLoginUrl = `${idpWebUrl}/authorize?${params.toString()}`;
 
     return idpLoginUrl;
   }
