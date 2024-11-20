@@ -34,8 +34,9 @@ enum ItemCategory {
 }
 
 enum PostStatus {
-  PENDING
+  IN_PROGRESS
   RESOLVED
+  CANCELLED
 }
 
 // 추가 features가 있을 수 있어서 Found와 Lost를 분리함
@@ -47,7 +48,7 @@ model FoundPost {
   images      String[] // image url list
   location    String
   category    ItemCategory
-  status      PostStatus   @default(PENDING)
+  status      PostStatus   @default(IN_PROGRESS)
   author      User         @relation(fields: [authorId], references: [uuid])
   authorId    String       @db.Uuid
   createdAt   DateTime     @default(now())
@@ -64,7 +65,7 @@ model LostPost {
   images      String[] // image url list
   location    String
   category    ItemCategory
-  status      PostStatus   @default(PENDING)
+  status      PostStatus   @default(IN_PROGRESS)
   author      User         @relation(fields: [authorId], references: [uuid])
   authorId    String       @db.Uuid
   createdAt   DateTime     @default(now())
