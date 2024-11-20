@@ -23,9 +23,8 @@ export class UserService {
     const redirectUrl = this.configService.get<string>('IDP_CALLBACK_URL');
     const responseType = 'code';
     const scope = 'openid profile offline_access';
-    const state = this.configService.get<string>('IDP_STATE');
 
-    const idpLoginUrl = `${idpUrl}/authorize?response_type=${responseType}&client_id=${clientId}&redirect_uri=${redirectUrl}&scope=${scope}&state=${state}&prompt=consent`;
+    const idpLoginUrl = `${idpUrl}/authorize?response_type=${responseType}&client_id=${clientId}&redirect_uri=${redirectUrl}&scope=${scope}&prompt=consent`;
 
     return idpLoginUrl;
   }
