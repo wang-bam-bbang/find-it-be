@@ -11,14 +11,17 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get('login')
-  async loginByIdP(@Res() res: Response) {
+  async loginByIdP(@Res({ passthrough: true }) res: Response) {
     const idpLoginUrl = await this.userService.getIdpLoginUrl();
 
     return res.redirect(idpLoginUrl);
   }
 
   @Get('callback')
-  async idpAuthCallback(@Query() { code }, @Res() res: Response) {
+  async idpAuthCallback(
+    @Query() code: string,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const { access_token, refresh_token, name } =
       await this.userService.login(code);
 
