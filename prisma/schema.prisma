@@ -49,15 +49,16 @@ model Post {
   type        PostType
   title       String       @db.VarChar(255)
   description String       @db.Text
-  images      String[] // image url list
-  location    Json? // location Json 구성 추후 논의
+  images      String[]
+  location    String
   category    ItemCategory @default(ETC)
   status      PostStatus
-  author      User         @relation(fields: [authorId], references: [uuid])
-  authorId    String       @db.Uuid
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   deletedAt   DateTime?
 
-  @@index([authorId])
+  authorId String @map("author_id") @db.Uuid
+  author   User   @relation(fields: [authorId], references: [uuid])
+
+  @@map("post")
 }
