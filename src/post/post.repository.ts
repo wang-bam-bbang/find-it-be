@@ -7,6 +7,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class PostRepository {
   constructor(private prismaService: PrismaService) {}
+
   async createPost(
     createPostDto: CreatePostDto,
     userUuid: string,
@@ -52,5 +53,33 @@ export class PostRepository {
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
     };
+  }
+
+  async findPostsByUser(userUuid: string): Promise<PostResponseDto[]> {
+    const posts = await this.prismaService.post.findMany({
+      where: { authorId: userUuid },
+      include: {
+        author: {
+          select: {
+            uuid: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    return posts.map((post) => ({
+      id: post.id,
+      type: post.type,
+      title: post.title,
+      description: post.description,
+      images: post.images,
+      location: post.location as string,
+      category: post.category,
+      status: post.status,
+      author: post.author,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+    }));
   }
 }

@@ -28,3 +28,9 @@ export class PostResponseDto {
 
   updatedAt: Date;
 }
+
+export class PostListDto {
+  total: number;
+
+  list: PostResponseDto[];
+}
