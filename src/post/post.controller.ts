@@ -29,6 +29,13 @@ export class PostController {
     return this.postService.createPost(createPostDto, user.uuid);
   }
 
+  @Get(':id')
+  async getPostByid(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<PostResponseDto> {
+    return this.postService.getPostById(id);
+  }
+
   @Patch(':id')
   @UseGuards(IdPGuard)
   async updatePost(

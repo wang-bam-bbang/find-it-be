@@ -30,6 +30,15 @@ export class PostService {
     };
   }
 
+  async getPostById(id: number): Promise<PostResponseDto> {
+    const post = await this.postRepository.findPostById(id);
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+    return post;
+  }
+
   async updatePost(id: number, updatePostDto: UpdatePostDto, userUuid: string) {
     const post = await this.postRepository.findPostById(id);
 
