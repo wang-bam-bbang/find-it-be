@@ -145,4 +145,12 @@ export class PostRepository {
       updatedAt: updatedPost.updatedAt,
     };
   }
+
+  async deletePost(id: number): Promise<void> {
+    await this.prismaService.post.delete({
+      where: {
+        id,
+      },
+    });
+  }
 }

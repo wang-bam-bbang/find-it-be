@@ -39,7 +39,11 @@ export class PostService {
     return post;
   }
 
-  async updatePost(id: number, updatePostDto: UpdatePostDto, userUuid: string) {
+  async updatePost(
+    id: number,
+    updatePostDto: UpdatePostDto,
+    userUuid: string,
+  ): Promise<PostResponseDto> {
     const post = await this.postRepository.findPostById(id);
 
     if (!post) {
@@ -49,6 +53,18 @@ export class PostService {
       throw new ForbiddenException("Don't have permission to update the post");
     }
     return this.postRepository.updatePost(id, updatePostDto);
+  }
+
+  async deletePost(id: number, userUuid: string): Promise<void> {
+    const post = await this.postRepository.findPostById(id);
+    if (!post) {
+      throw new NotFoundException('Post not found.');
+    }
+    if (post.author.uuid != userUuid) {
+      throw new ForbiddenException("Don't have permission to update the post");
+    }
+
+    return this.postRepository.deletePost(id);
   }
 
   async createPost(
