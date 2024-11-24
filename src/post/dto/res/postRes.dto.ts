@@ -31,6 +31,7 @@ export class PostResponseDto {
 
 export class PostListDto {
   total: number;
-
   list: PostResponseDto[];
+
+  nextCursor?: number;
 }

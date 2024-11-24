@@ -9,6 +9,7 @@ import { PostRepository } from './post.repository';
 import { CreatePostDto } from './dto/req/createPost.dto';
 import { PostListDto, PostResponseDto } from './dto/res/postRes.dto';
 import { UpdatePostDto } from './dto/req/updatePost.dto';
+import { PostFilterDto } from './dto/req/postFilter.dto';
 
 @Injectable()
 export class PostService {
@@ -17,7 +18,20 @@ export class PostService {
     private postRepository: PostRepository,
   ) {}
 
-  async getMyPosts(userUuid: string): Promise<PostListDto> {
+  async getPostList(postFilterDto: PostFilterDto): Promise<PostListDto> {
+    const postList = await this.postRepository.findPostList(postFilterDto);
+
+    const nextCursor =
+      postList.length > 0 ? postList[postList.length - 1].id : null;
+
+    return {
+      total: postList.length,
+      list: postList,
+      nextCursor,
+    };
+  }
+
+  async getMyPostList(userUuid: string): Promise<PostListDto> {
     const posts = await this.postRepository.findPostsByUser(userUuid);
 
     if (!posts.length) {

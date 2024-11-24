@@ -4,10 +4,52 @@ import { CreatePostDto } from './dto/req/createPost.dto';
 import { PostResponseDto } from './dto/res/postRes.dto';
 import { Injectable } from '@nestjs/common';
 import { UpdatePostDto } from './dto/req/updatePost.dto';
+import { PostFilterDto } from './dto/req/postFilter.dto';
 
 @Injectable()
 export class PostRepository {
   constructor(private prismaService: PrismaService) {}
+
+  async findPostList(postFilterDto: PostFilterDto): Promise<PostResponseDto[]> {
+    const { category, type, status, cursor, take = 10 } = postFilterDto;
+
+    const where = {
+      ...(category && { category }),
+      ...(type && { type }),
+      ...(status && { status }),
+    };
+
+    console.log(where);
+
+    const postList = await this.prismaService.post.findMany({
+      where,
+      take,
+      skip: cursor ? 1 : 0,
+      cursor: cursor ? { id: cursor } : undefined,
+      include: {
+        author: {
+          select: {
+            uuid: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    return postList.map((post) => ({
+      id: post.id,
+      type: post.type,
+      title: post.title,
+      description: post.description,
+      images: post.images,
+      location: post.location as string,
+      category: post.category,
+      status: post.status,
+      author: post.author,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+    }));
+  }
 
   async createPost(
     createPostDto: CreatePostDto,
