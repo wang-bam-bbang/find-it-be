@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CreateCommentDto } from './dto/req/createComment.dto';
 import { CommentResponseDto } from './dto/res/commentRes.dto';
@@ -40,5 +44,21 @@ export class CommentService {
 
   async getPostComments(postId: number): Promise<CommentResponseDto[]> {
     return this.commentRepository.getPostComments(postId);
+  }
+
+  async deleteComment(userUuid: string, commentId: number): Promise<void> {
+    const comment = await this.commentRepository.getCommentById(commentId);
+
+    if (!comment) {
+      throw new NotFoundException('Comment not found');
+    }
+
+    if (comment.author.uuid !== userUuid) {
+      throw new ForbiddenException(
+        "Don't have permission to delete the comment",
+      );
+    }
+
+    await this.commentRepository.deleteComment(commentId);
   }
 }

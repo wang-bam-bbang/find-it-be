@@ -95,7 +95,13 @@ export class CommentRepository {
               },
             },
           },
+          orderBy: {
+            id: 'asc',
+          },
         },
+      },
+      orderBy: {
+        id: 'asc',
       },
     });
 
@@ -123,5 +129,17 @@ export class CommentRepository {
         isDeleted: child.isDeleted,
       })),
     }));
+  }
+
+  async deleteComment(commentId: number): Promise<void> {
+    await this.prismaService.comment.update({
+      where: {
+        id: commentId,
+      },
+      data: {
+        content: '',
+        isDeleted: true,
+      },
+    });
   }
 }

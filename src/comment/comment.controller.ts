@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -13,6 +14,7 @@ import { IdPGuard } from 'src/user/guard/idp.guard';
 import { CreateCommentDto } from './dto/req/createComment.dto';
 import { CommentResponseDto } from './dto/res/commentRes.dto';
 import { CommentService } from './comment.service';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('comment')
 export class CommentController {
@@ -32,5 +34,15 @@ export class CommentController {
     @Param('postId', ParseIntPipe) postId: number,
   ): Promise<CommentResponseDto[]> {
     return this.commentService.getPostComments(postId);
+  }
+
+  @ApiBearerAuth('access-token')
+  @Delete(':commentId')
+  @UseGuards(IdPGuard)
+  async deleteComment(
+    @GetUser() user: User,
+    @Param('commentId', ParseIntPipe) commentId: number,
+  ): Promise<void> {
+    this.commentService.deleteComment(user.uuid, commentId);
   }
 }
