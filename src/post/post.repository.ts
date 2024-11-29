@@ -34,6 +34,8 @@ export class PostRepository {
       },
     });
 
+    console.log(postList);
+
     return postList.map((post) => ({
       id: post.id,
       type: post.type,
