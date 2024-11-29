@@ -3,6 +3,7 @@ import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreatePostDto {
   @IsEnum(PostType)
+  @IsNotEmpty()
   type: PostType;
 
   @IsString()

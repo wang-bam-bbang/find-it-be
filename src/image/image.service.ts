@@ -48,10 +48,7 @@ export class ImageService {
    * @returns string
    */
   private async uploadImage(file: Express.Multer.File): Promise<string> {
-    console.log(file);
-
     const key = `${Date.now()}-${Math.random().toString(36).substring(2)}${file.originalname}`;
-    console.log(key);
 
     const webpFile = await this.convertToWebp(file);
 
