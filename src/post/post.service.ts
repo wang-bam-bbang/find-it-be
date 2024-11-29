@@ -48,10 +48,6 @@ export class PostService {
   async getMyPostList(userUuid: string): Promise<PostListDto> {
     const posts = await this.postRepository.findPostsByUser(userUuid);
 
-    if (!posts.length) {
-      throw new NotFoundException('No posts found for this user');
-    }
-
     const formattedPosts = posts.map((post) => ({
       ...post,
       images: post.images.map((key) => `${this.s3Url}/${key}`),
