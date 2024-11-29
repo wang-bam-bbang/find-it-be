@@ -17,11 +17,26 @@ import { User } from '@prisma/client';
 import { UserInfoResDto } from './dto/res/userInfoRes.dto';
 import { LoginCallbackDto } from './dto/req/callBack.dto';
 import { JwtTokenResDto } from './dto/res/jwtTokenRes.dto';
+import {
+  ApiBearerAuth,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
+@ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @ApiOperation({
+    summary: 'Get Idp Login Url',
+    description:
+      'Get Idp Login Url, login it, and redirect to callback api endpoint',
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
   @Get('login')
   async loginByIdP(): Promise<string> {
     const idpLoginUrl = await this.userService.getIdpLoginUrl();
@@ -29,6 +44,14 @@ export class UserController {
     return idpLoginUrl;
   }
 
+  @ApiOperation({
+    summary: 'Callback for Login with idp',
+    description:
+      'With input authorization code, this endpoint return jwt token to users',
+  })
+  @ApiOkResponse({ type: JwtTokenResDto, description: 'Return jwt token' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
   @Get('callback')
   async idpAuthCallback(
     @Query() { code }: LoginCallbackDto,
@@ -68,6 +91,17 @@ export class UserController {
     return { access_token };
   }
 
+  @ApiOperation({
+    summary: 'get user info',
+    description: 'get user info with token',
+  })
+  @ApiOkResponse({
+    type: UserInfoResDto,
+    description: 'Return User Information',
+  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
+  @ApiBearerAuth('access-token')
   @Get('info')
   @UseGuards(IdPGuard)
   async getUserInfo(@GetUser() user: User): Promise<UserInfoResDto> {
