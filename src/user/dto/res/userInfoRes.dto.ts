@@ -1,4 +1,4 @@
-export type UserInfoResDto = {
+export class UserInfoResDto {
   uuid: string;
   name: string;
-};
+}
