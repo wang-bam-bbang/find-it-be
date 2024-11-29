@@ -33,7 +33,7 @@ export class CreatePostDto {
 
   @ApiProperty({
     type: [String],
-    description: 'Description of post',
+    description: 'Array of image keys/filenames for the post',
     example: 'thisisanimagekey.jpg',
   })
   @IsString({ each: true })
@@ -41,8 +41,8 @@ export class CreatePostDto {
   images: string[] = [];
 
   @ApiProperty({
-    type: [String],
-    description: 'Location Information. To be configured',
+    type: String,
+    description: 'Location where the item was found or lost. To be configured',
     example: '',
   })
   @IsString()

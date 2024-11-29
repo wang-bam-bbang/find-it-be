@@ -75,7 +75,7 @@ export class PostController {
     description: 'create post with token',
   })
   @ApiOkResponse({
-    type: PostListDto,
+    type: PostResponseDto,
     description: 'Return Created Post',
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
