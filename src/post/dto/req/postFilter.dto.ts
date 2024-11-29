@@ -1,6 +1,6 @@
 import { ItemCategory, PostStatus, PostType } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, Max } from 'class-validator';
 
 export class PostFilterDto {
   @IsEnum(ItemCategory)
@@ -22,5 +22,6 @@ export class PostFilterDto {
 
   @IsInt()
   @IsOptional()
+  @Max(20)
   take?: number;
 }
