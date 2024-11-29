@@ -19,8 +19,6 @@ export class PostRepository {
       ...(status && { status }),
     };
 
-    console.log(where);
-
     const postList = await this.prismaService.post.findMany({
       where,
       take,
