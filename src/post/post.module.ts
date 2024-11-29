@@ -6,9 +6,16 @@ import { UserModule } from 'src/user/user.module';
 import { PostService } from './post.service';
 import { PostRepository } from './post.repository';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { ImageModule } from 'src/image/image.module';
 
 @Module({
-  imports: [PassportModule, ConfigModule, UserModule, PrismaModule],
+  imports: [
+    PassportModule,
+    ConfigModule,
+    UserModule,
+    PrismaModule,
+    ImageModule,
+  ],
   providers: [PostService, PostRepository],
   controllers: [PostController],
 })

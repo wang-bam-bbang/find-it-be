@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
+import { ImageModule } from './image/image.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { PostModule } from './post/post.module';
     }),
     UserModule,
     PostModule,
+    ImageModule,
   ],
   controllers: [AppController],
   providers: [],

@@ -10,23 +10,37 @@ import { CreatePostDto } from './dto/req/createPost.dto';
 import { PostListDto, PostResponseDto } from './dto/res/postRes.dto';
 import { UpdatePostDto } from './dto/req/updatePost.dto';
 import { PostFilterDto } from './dto/req/postFilter.dto';
+import { ImageService } from 'src/image/image.service';
 
 @Injectable()
 export class PostService {
+  private readonly s3Url: string;
+
   constructor(
     private configService: ConfigService,
     private postRepository: PostRepository,
-  ) {}
+    private imageService: ImageService,
+  ) {
+    // S3 URL 기본 경로 설정
+    this.s3Url = `https://${this.configService.get<string>(
+      'AWS_S3_BUCKET_NAME',
+    )}.s3.${this.configService.get<string>('AWS_S3_REGION')}.amazonaws.com`;
+  }
 
   async getPostList(postFilterDto: PostFilterDto): Promise<PostListDto> {
     const postList = await this.postRepository.findPostList(postFilterDto);
+
+    const formattedPosts = postList.map((post) => ({
+      ...post,
+      images: post.images.map((key) => `${this.s3Url}/${key}`),
+    }));
 
     const nextCursor =
       postList.length > 0 ? postList[postList.length - 1].id : null;
 
     return {
       total: postList.length,
-      list: postList,
+      list: formattedPosts,
       nextCursor,
     };
   }
@@ -38,9 +52,14 @@ export class PostService {
       throw new NotFoundException('No posts found for this user');
     }
 
+    const formattedPosts = posts.map((post) => ({
+      ...post,
+      images: post.images.map((key) => `${this.s3Url}/${key}`),
+    }));
+
     return {
       total: posts.length,
-      list: posts,
+      list: formattedPosts,
     };
   }
 
@@ -50,7 +69,10 @@ export class PostService {
     if (!post) {
       throw new NotFoundException('Post not found');
     }
-    return post;
+    return {
+      ...post,
+      images: post.images.map((key) => `${this.s3Url}/${key}`),
+    };
   }
 
   async updatePost(
@@ -85,8 +107,9 @@ export class PostService {
     createPostDto: CreatePostDto,
     userUuid: string,
   ): Promise<PostResponseDto> {
-    // TODO: image url valication process need to be added.
-    // S3 key가 올바른지
+    if (createPostDto.images.length) {
+      await this.imageService.validateImages(createPostDto.images);
+    }
 
     // : Promise<Post & { author: Pick<User, 'name' | 'uuid'> }>
     const newPost = this.postRepository.createPost(createPostDto, userUuid);
