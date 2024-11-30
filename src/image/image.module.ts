@@ -6,7 +6,7 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
-  imports: [PassportModule, ConfigModule, S3Client],
+  imports: [PassportModule, ConfigModule],
   providers: [ImageService, S3Client],
   controllers: [ImageController],
   exports: [ImageService],

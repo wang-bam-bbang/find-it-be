@@ -7,7 +7,7 @@ import { CreateCommentDto } from './dto/req/createComment.dto';
 export class CommentRepository {
   constructor(private prismaService: PrismaService) {}
 
-  async getCommentById(id): Promise<CommentResponseDto> {
+  async getCommentById(id: number): Promise<CommentResponseDto> {
     return this.prismaService.comment.findUnique({
       where: {
         id,

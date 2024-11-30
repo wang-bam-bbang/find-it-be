@@ -3,7 +3,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { CreateCommentDto } from './dto/req/createComment.dto';
 import { CommentResponseDto } from './dto/res/commentRes.dto';
 import { PostService } from 'src/post/post.service';
@@ -12,7 +11,6 @@ import { CommentRepository } from './comment.repository';
 @Injectable()
 export class CommentService {
   constructor(
-    private configSerivce: ConfigService,
     private postService: PostService,
     private commentRepository: CommentRepository,
   ) {}
@@ -23,13 +21,14 @@ export class CommentService {
   ): Promise<CommentResponseDto> {
     const { postId, parentId } = createCommentDto;
 
-    const post = this.postService.getPostById(postId);
+    const post = await this.postService.getPostById(postId);
     if (!post) {
       throw new NotFoundException('Post not found');
     }
 
     if (parentId) {
-      const parentComment = this.commentRepository.getCommentById(parentId);
+      const parentComment =
+        await this.commentRepository.getCommentById(parentId);
       if (!parentComment) {
         throw new NotFoundException('Parent comment not found');
       }

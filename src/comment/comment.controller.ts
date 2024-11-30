@@ -87,6 +87,6 @@ export class CommentController {
     @GetUser() user: User,
     @Param('commentId', ParseIntPipe) commentId: number,
   ): Promise<void> {
-    this.commentService.deleteComment(user.uuid, commentId);
+    await this.commentService.deleteComment(user.uuid, commentId);
   }
 }
