@@ -18,5 +18,6 @@ import { ImageModule } from 'src/image/image.module';
   ],
   providers: [PostService, PostRepository],
   controllers: [PostController],
+  exports: [PostService],
 })
 export class PostModule {}

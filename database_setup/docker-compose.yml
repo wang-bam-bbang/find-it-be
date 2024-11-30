@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: shadow
+      POSTGRES_DB: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
   postgres_shadow:
