@@ -24,7 +24,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-@ApiTags('comment')
+@ApiTags('Comment')
 @Controller('comment')
 export class CommentController {
   constructor(private commentService: CommentService) {}

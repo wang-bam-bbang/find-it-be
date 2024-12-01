@@ -15,12 +15,14 @@ import {
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { IdPGuard } from 'src/user/guard/idp.guard';
 import { GetUser } from 'src/user/decorator/get-user.decorator';
 import { User } from '@prisma/client';
 
+@ApiTags('Image')
 @Controller('image')
 export class ImageController {
   constructor(private imageService: ImageService) {}
