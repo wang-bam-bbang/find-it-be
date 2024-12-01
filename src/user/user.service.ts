@@ -18,7 +18,7 @@ export class UserService {
   ) {}
 
   async getIdpLoginUrl(): Promise<string> {
-    const idpWebUrl = 'https://idp.gistory.me';
+    const idpWebUrl = this.configService.get<string>('IDP_WEB_URL');
 
     const params = new URLSearchParams({
       response_type: 'code',
