@@ -1,9 +1,11 @@
 import {
   DeleteObjectCommand,
+  GetObjectCommand,
   PutObjectCommand,
   PutObjectTaggingCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import {
   BadRequestException,
   Injectable,
@@ -139,5 +141,30 @@ export class ImageService {
     await this.s3Client.send(command).catch((error) => {
       throw new InternalServerErrorException(error);
     });
+  }
+
+  /**
+   * multiple keys에 대한 signed URLs 생성하기
+   * @param keys string[]
+   * @returns string[]
+   */
+  async generateSignedUrls(keys: string[]): Promise<string[]> {
+    try {
+      const signedUrls = await Promise.all(
+        keys.map((key) =>
+          getSignedUrl(
+            this.s3Client,
+            new GetObjectCommand({ Bucket: this.bucketName, Key: key }),
+            {
+              expiresIn: 3600, // URL 유효 기간 (초), 1시간 설정
+            },
+          ),
+        ),
+      );
+      return signedUrls;
+    } catch (error) {
+      console.error('Error generating signed URLs:', error);
+      throw new InternalServerErrorException('Failed to generate signed URLs');
+    }
   }
 }
