@@ -40,9 +40,9 @@ async function bootstrap() {
           authorizationUrl: `${process.env.IDP_WEB_URL}/authorize?prompt=consent`,
           tokenUrl: `${process.env.IDP_URL}/oauth/token`,
           scopes: {
-            openid: '',
-            profile: '',
-            offline_access: '',
+            openid: 'openid',
+            profile: 'profile',
+            offline_access: 'offline_access',
           },
         },
       },

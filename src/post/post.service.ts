@@ -30,10 +30,17 @@ export class PostService {
   async getPostList(postFilterDto: PostFilterDto): Promise<PostListDto> {
     const postList = await this.postRepository.findPostList(postFilterDto);
 
-    const formattedPosts = postList.map((post) => ({
-      ...post,
-      images: post.images.map((key) => `${this.s3Url}/${key}`),
-    }));
+    const formattedPosts = await Promise.all(
+      postList.map(async (post) => {
+        const signedUrls = await this.imageService.generateSignedUrls(
+          post.images,
+        );
+        return {
+          ...post,
+          images: signedUrls, // Signed URL 반환
+        };
+      }),
+    );
 
     const nextCursor =
       postList.length > 0 ? postList[postList.length - 1].id : null;
@@ -46,15 +53,22 @@ export class PostService {
   }
 
   async getMyPostList(userUuid: string): Promise<PostListDto> {
-    const posts = await this.postRepository.findPostsByUser(userUuid);
+    const postList = await this.postRepository.findPostsByUser(userUuid);
 
-    const formattedPosts = posts.map((post) => ({
-      ...post,
-      images: post.images.map((key) => `${this.s3Url}/${key}`),
-    }));
+    const formattedPosts = await Promise.all(
+      postList.map(async (post) => {
+        const signedUrls = await this.imageService.generateSignedUrls(
+          post.images,
+        );
+        return {
+          ...post,
+          images: signedUrls, // Signed URL 반환
+        };
+      }),
+    );
 
     return {
-      total: posts.length,
+      total: postList.length,
       list: formattedPosts,
     };
   }
@@ -65,9 +79,11 @@ export class PostService {
     if (!post) {
       throw new NotFoundException('Post not found');
     }
+    const signedUrls = await this.imageService.generateSignedUrls(post.images);
+
     return {
       ...post,
-      images: post.images.map((key) => `${this.s3Url}/${key}`),
+      images: signedUrls,
     };
   }
 
@@ -84,7 +100,16 @@ export class PostService {
     if (post.author.uuid != userUuid) {
       throw new ForbiddenException("Don't have permission to update the post");
     }
-    return this.postRepository.updatePost(id, updatePostDto);
+    const updatedPost = await this.postRepository.updatePost(id, updatePostDto);
+
+    const signedUrls = await this.imageService.generateSignedUrls(
+      updatedPost.images,
+    );
+
+    return {
+      ...updatedPost,
+      images: signedUrls,
+    };
   }
 
   async deletePost(id: number, userUuid: string): Promise<void> {
@@ -107,11 +132,20 @@ export class PostService {
       await this.imageService.validateImages(createPostDto.images);
     }
 
-    // : Promise<Post & { author: Pick<User, 'name' | 'uuid'> }>
-    const newPost = this.postRepository.createPost(createPostDto, userUuid);
+    const newPost = await this.postRepository.createPost(
+      createPostDto,
+      userUuid,
+    );
+
+    const signedUrls = await this.imageService.generateSignedUrls(
+      newPost.images,
+    );
 
     // TODO: FCM process need to be added.
 
-    return newPost;
+    return {
+      ...newPost,
+      images: signedUrls,
+    };
   }
 }
