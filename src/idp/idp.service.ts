@@ -91,7 +91,7 @@ export class IdpService {
     const tokenResponse = await firstValueFrom(
       this.httpService
         .post<IdpJwtResponse>(
-          this.idpUrl + '/token',
+          this.idpUrl + '/oauth/token',
           {
             grant_type: 'refresh_token',
             refresh_token: refreshToken,

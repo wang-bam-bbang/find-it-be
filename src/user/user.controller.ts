@@ -19,6 +19,8 @@ import { LoginCallbackDto } from './dto/req/callBack.dto';
 import { JwtTokenResDto } from './dto/res/jwtTokenRes.dto';
 import {
   ApiBearerAuth,
+  ApiCookieAuth,
+  ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiOperation,
@@ -70,12 +72,21 @@ export class UserController {
     return { access_token };
   }
 
+  @ApiOperation({
+    summary: 'Refresh token',
+    description: 'Refresh the access token from idp',
+  })
+  @ApiCookieAuth('refresh_token')
+  @ApiCreatedResponse({ type: JwtTokenResDto, description: 'Return jwt token' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
   @Post('refresh')
   async refreshToken(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<JwtTokenResDto> {
     const refreshToken = req.cookies['refresh_token'];
+
     if (!refreshToken) throw new UnauthorizedException();
 
     const { access_token, refresh_token } =
