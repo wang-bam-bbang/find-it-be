@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -52,7 +53,10 @@ export class IdpService {
             if (error instanceof AxiosError && error.response?.status === 401) {
               throw new UnauthorizedException();
             }
-            throw new InternalServerErrorException();
+            if (error instanceof AxiosError && error.response?.status === 400) {
+              throw new BadRequestException(error.response.data);
+            }
+            throw new InternalServerErrorException(error.response.data);
           }),
         ),
     );

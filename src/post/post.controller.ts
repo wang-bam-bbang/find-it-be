@@ -27,6 +27,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { MyPostFilterDto } from './dto/req/myPostFilter.dto';
 
 @ApiTags('Post')
 @Controller('post')
@@ -66,8 +67,11 @@ export class PostController {
   @ApiBearerAuth('access-token')
   @Get('my-posts')
   @UseGuards(IdPGuard)
-  async getMyPosts(@GetUser() user: User): Promise<PostListDto> {
-    return this.postService.getMyPostList(user.uuid);
+  async getMyPosts(
+    @GetUser() user: User,
+    @Query() myPostFilterDto: MyPostFilterDto,
+  ): Promise<PostListDto> {
+    return this.postService.getMyPostList(user.uuid, myPostFilterDto);
   }
 
   @ApiOperation({

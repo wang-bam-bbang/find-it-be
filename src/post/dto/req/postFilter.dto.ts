@@ -37,7 +37,7 @@ export class PostFilterDto {
   @ApiProperty({
     type: Number,
     description: 'Pagination cursor for next set of results',
-    example: 17,
+    example: 0,
   })
   @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
   @IsInt()

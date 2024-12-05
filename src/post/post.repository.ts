@@ -5,6 +5,7 @@ import { PostResponseDto } from './dto/res/postRes.dto';
 import { Injectable } from '@nestjs/common';
 import { UpdatePostDto } from './dto/req/updatePost.dto';
 import { PostFilterDto } from './dto/req/postFilter.dto';
+import { PostType } from '@prisma/client';
 
 @Injectable()
 export class PostRepository {
@@ -96,9 +97,12 @@ export class PostRepository {
     };
   }
 
-  async findPostsByUser(userUuid: string): Promise<PostResponseDto[]> {
+  async findPostsByUser(
+    userUuid: string,
+    type?: PostType,
+  ): Promise<PostResponseDto[]> {
     const posts = await this.prismaService.post.findMany({
-      where: { authorId: userUuid },
+      where: { authorId: userUuid, type },
       include: {
         author: {
           select: {
