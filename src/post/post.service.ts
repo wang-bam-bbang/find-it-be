@@ -11,6 +11,7 @@ import { PostListDto, PostResponseDto } from './dto/res/postRes.dto';
 import { UpdatePostDto } from './dto/req/updatePost.dto';
 import { PostFilterDto } from './dto/req/postFilter.dto';
 import { ImageService } from 'src/image/image.service';
+import { MyPostFilterDto } from './dto/req/myPostFilter.dto';
 
 @Injectable()
 export class PostService {
@@ -52,8 +53,13 @@ export class PostService {
     };
   }
 
-  async getMyPostList(userUuid: string): Promise<PostListDto> {
-    const postList = await this.postRepository.findPostsByUser(userUuid);
+  async getMyPostList(
+    userUuid: string,
+    myPostFilterDto: MyPostFilterDto,
+  ): Promise<PostListDto> {
+    const { type } = myPostFilterDto;
+
+    const postList = await this.postRepository.findPostsByUser(userUuid, type);
 
     const formattedPosts = await Promise.all(
       postList.map(async (post) => {
@@ -83,6 +89,31 @@ export class PostService {
 
     return {
       ...post,
+      images: signedUrls,
+    };
+  }
+
+  async createPost(
+    createPostDto: CreatePostDto,
+    userUuid: string,
+  ): Promise<PostResponseDto> {
+    if (createPostDto.images.length) {
+      await this.imageService.validateImages(createPostDto.images);
+    }
+
+    const newPost = await this.postRepository.createPost(
+      createPostDto,
+      userUuid,
+    );
+
+    const signedUrls = await this.imageService.generateSignedUrls(
+      newPost.images,
+    );
+
+    // TODO: FCM process need to be added.
+
+    return {
+      ...newPost,
       images: signedUrls,
     };
   }
@@ -122,30 +153,5 @@ export class PostService {
     }
 
     return this.postRepository.deletePost(id);
-  }
-
-  async createPost(
-    createPostDto: CreatePostDto,
-    userUuid: string,
-  ): Promise<PostResponseDto> {
-    if (createPostDto.images.length) {
-      await this.imageService.validateImages(createPostDto.images);
-    }
-
-    const newPost = await this.postRepository.createPost(
-      createPostDto,
-      userUuid,
-    );
-
-    const signedUrls = await this.imageService.generateSignedUrls(
-      newPost.images,
-    );
-
-    // TODO: FCM process need to be added.
-
-    return {
-      ...newPost,
-      images: signedUrls,
-    };
   }
 }
