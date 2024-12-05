@@ -34,7 +34,7 @@ export class CreatePostDto {
   @ApiProperty({
     type: [String],
     description: 'Array of image keys/filenames for the post',
-    example: '[thisisanimagekey.jpg]',
+    example: ['thisisanimagekey.jpg'],
   })
   @IsString({ each: true })
   @IsOptional()
