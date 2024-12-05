@@ -10,6 +10,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -139,7 +140,11 @@ export class ImageService {
       },
     });
     await this.s3Client.send(command).catch((error) => {
-      throw new InternalServerErrorException(error);
+      if (error.Code === 'AccessDenied') {
+        throw new NotFoundException('Image key is invalid');
+      }
+
+      throw new InternalServerErrorException();
     });
   }
 
