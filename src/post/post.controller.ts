@@ -69,7 +69,6 @@ export class PostController {
   @UseGuards(IdPGuard)
   async getMyPosts(
     @GetUser() user: User,
-
     @Query() myPostFilterDto: MyPostFilterDto,
   ): Promise<PostListDto> {
     return this.postService.getMyPostList(user.uuid, myPostFilterDto);

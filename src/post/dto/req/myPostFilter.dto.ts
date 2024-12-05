@@ -8,6 +8,7 @@ export class MyPostFilterDto {
     enumName: 'PostType',
     description: 'Type of post (FOUND or LOST)',
     example: PostType.FOUND,
+    required: false,
   })
   @IsEnum(PostType)
   @IsOptional()
