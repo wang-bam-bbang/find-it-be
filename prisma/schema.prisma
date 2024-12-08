@@ -73,7 +73,7 @@ model Post {
 
 model Building {
   id     Int    @id @default(autoincrement())
-  name   String @db.VarChar(255)
+  name   String @unique() @db.VarChar(255)
   enName String @db.VarChar(255)
   gps    String @db.VarChar(255)
   code   String @db.VarChar(50) // 건물 번호 e.g. E11
