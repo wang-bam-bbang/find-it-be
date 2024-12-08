@@ -16,7 +16,7 @@ export class PostResponseDto {
 
   images: string[];
 
-  location: string;
+  // location: string;
 
   category: ItemCategory;
 

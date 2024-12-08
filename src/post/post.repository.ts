@@ -41,7 +41,7 @@ export class PostRepository {
       title: post.title,
       description: post.description,
       images: post.images,
-      location: post.location as string,
+      // location: post.location as string,
       category: post.category,
       status: post.status,
       author: post.author,
@@ -54,8 +54,10 @@ export class PostRepository {
     createPostDto: CreatePostDto,
     userUuid: string,
   ): Promise<PostResponseDto> {
-    const { type, title, description, images, location, category } =
-      createPostDto;
+    // const { type, title, description, images, location, category } =
+    //   createPostDto;
+
+    const { type, title, description, images, category } = createPostDto;
 
     const post = await this.prismaService.post.create({
       data: {
@@ -68,7 +70,7 @@ export class PostRepository {
         title,
         description,
         images,
-        location,
+        // location,
         category,
         status: 'IN_PROGRESS',
       },
@@ -88,7 +90,7 @@ export class PostRepository {
       title: post.title,
       description: post.description,
       images: post.images,
-      location: post.location as string,
+      // location: post.location as string,
       category: post.category,
       status: post.status,
       author: post.author,
@@ -119,7 +121,7 @@ export class PostRepository {
       title: post.title,
       description: post.description,
       images: post.images,
-      location: post.location as string,
+      // location: post.location as string,
       category: post.category,
       status: post.status,
       author: post.author,
@@ -149,7 +151,7 @@ export class PostRepository {
       title: post.title,
       description: post.description,
       images: post.images,
-      location: post.location as string, // 변환 추가
+      // location: post.location as string, // 변환 추가
       category: post.category,
       status: post.status,
       author: post.author,
@@ -181,7 +183,7 @@ export class PostRepository {
       title: updatedPost.title,
       description: updatedPost.description,
       images: updatedPost.images,
-      location: updatedPost.location as string,
+      // location: updatedPost.location as string,
       category: updatedPost.category,
       status: updatedPost.status,
       author: updatedPost.author,

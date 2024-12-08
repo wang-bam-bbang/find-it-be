@@ -40,14 +40,14 @@ export class CreatePostDto {
   @IsOptional()
   images: string[] = [];
 
-  @ApiProperty({
-    type: String,
-    description: 'Location where the item was found or lost. To be configured',
-    example: '',
-  })
-  @IsString()
-  @IsNotEmpty()
-  location: string;
+  // @ApiProperty({
+  //   type: String,
+  //   description: 'Location where the item was found or lost. To be configured',
+  //   example: '',
+  // })
+  // @IsString()
+  // @IsNotEmpty()
+  // location: string;
 
   @ApiProperty({
     enum: ItemCategory,
