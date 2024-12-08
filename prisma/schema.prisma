@@ -48,23 +48,41 @@ enum PostType {
 }
 
 model Post {
-  id          Int          @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   type        PostType
-  title       String       @db.VarChar(255)
-  description String       @db.Text
+  title       String   @db.VarChar(255)
+  description String   @db.Text
   images      String[]
-  location    String
-  category    ItemCategory @default(ETC)
-  status      PostStatus
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  deletedAt   DateTime?
+
+  category  ItemCategory @default(ETC)
+  status    PostStatus
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  deletedAt DateTime?
 
   authorId String    @db.Uuid
   author   User      @relation(fields: [authorId], references: [uuid])
   Comment  Comment[]
 
+  // buildingId     Int      @default(1)
+  // Building       Building @relation(fields: [buildingId], references: [id])
+  // locationDetail String? // 세부 위치
+
   @@map("post")
+}
+
+model Building {
+  id     Int    @id @default(autoincrement())
+  name   String @db.VarChar(255)
+  enName String @db.VarChar(255)
+  gps    String @db.VarChar(255)
+  code   String @db.VarChar(50) // 건물 번호 e.g. E11
+  // posts  Post[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("building")
 }
 
 enum CommentType {
