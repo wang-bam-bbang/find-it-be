@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class CreateBuildingDto {
   @ApiProperty({
@@ -27,6 +27,9 @@ export class CreateBuildingDto {
   })
   @IsString()
   @IsNotEmpty()
+  @Matches(/^\((-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)\)$/, {
+    message: 'GPS must be in format (latitude, longitude)',
+  })
   gps: string;
 
   @ApiProperty({
