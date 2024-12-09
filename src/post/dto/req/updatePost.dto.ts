@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PostStatus } from '@prisma/client';
-import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export class UpdatePostDto {
   @ApiProperty({
@@ -52,5 +58,6 @@ export class UpdatePostDto {
   })
   @IsString()
   @IsOptional()
+  @MaxLength(255)
   locationDetail?: string;
 }
