@@ -50,4 +50,8 @@ export class BuildingService {
 
     return this.buildingRepository.deleteBuilding(id);
   }
+
+  async getBuildingById(id: number): Promise<BuildingResponseDto> {
+    return this.buildingRepository.getBuildingById(id);
+  }
 }
