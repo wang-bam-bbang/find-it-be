@@ -5,6 +5,14 @@ export class AuthorDto {
   name: string;
 }
 
+export class BuildingDto {
+  id: number;
+  name: string;
+  enName: string;
+  gps: string;
+  code: string;
+}
+
 export class PostResponseDto {
   id: number;
 
@@ -16,13 +24,15 @@ export class PostResponseDto {
 
   images: string[];
 
-  location: string;
-
   category: ItemCategory;
 
   status: PostStatus;
 
   author: AuthorDto;
+
+  building: BuildingDto;
+
+  locationDetail: string;
 
   createdAt: Date;
 

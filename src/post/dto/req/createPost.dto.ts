@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ItemCategory, PostType } from '@prisma/client';
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export class CreatePostDto {
   @ApiProperty({
@@ -41,13 +48,23 @@ export class CreatePostDto {
   images: string[] = [];
 
   @ApiProperty({
+    type: Number,
+    description: 'Building where the item was found or lost.',
+    example: 1,
+  })
+  @IsInt()
+  @IsNotEmpty()
+  buildingId: number;
+
+  @ApiProperty({
     type: String,
-    description: 'Location where the item was found or lost. To be configured',
-    example: '',
+    description: 'Detailed location description.',
+    example: '206호로 추정',
   })
   @IsString()
   @IsNotEmpty()
-  location: string;
+  @MaxLength(255)
+  locationDetail: string;
 
   @ApiProperty({
     enum: ItemCategory,

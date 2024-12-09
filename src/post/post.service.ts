@@ -1,6 +1,7 @@
 import {
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -12,6 +13,7 @@ import { UpdatePostDto } from './dto/req/updatePost.dto';
 import { PostFilterDto } from './dto/req/postFilter.dto';
 import { ImageService } from 'src/image/image.service';
 import { MyPostFilterDto } from './dto/req/myPostFilter.dto';
+import { BuildingService } from 'src/building/building.service';
 
 @Injectable()
 export class PostService {
@@ -21,6 +23,7 @@ export class PostService {
     private configService: ConfigService,
     private postRepository: PostRepository,
     private imageService: ImageService,
+    private buildingService: BuildingService,
   ) {
     // S3 URL 기본 경로 설정
     this.s3Url = `https://${this.configService.get<string>(
@@ -97,6 +100,20 @@ export class PostService {
     createPostDto: CreatePostDto,
     userUuid: string,
   ): Promise<PostResponseDto> {
+    try {
+      const building = await this.buildingService.getBuildingById(
+        createPostDto.buildingId,
+      );
+      if (!building) {
+        throw new NotFoundException('Building not found.');
+      }
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('Building not found.');
+      }
+      throw new InternalServerErrorException('Failed to validate building.');
+    }
+
     if (createPostDto.images.length) {
       await this.imageService.validateImages(createPostDto.images);
     }

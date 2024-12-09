@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PostStatus } from '@prisma/client';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export class UpdatePostDto {
   @ApiProperty({
@@ -33,4 +39,25 @@ export class UpdatePostDto {
   @IsEnum(PostStatus)
   @IsOptional()
   status?: PostStatus;
+
+  @ApiProperty({
+    type: Number,
+    description: 'Building where the item was found or lost.',
+    example: 1,
+    required: false,
+  })
+  @IsInt()
+  @IsOptional()
+  buildingId?: number;
+
+  @ApiProperty({
+    type: String,
+    description: 'Detailed location description.',
+    example: '204호로 추정',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  @MaxLength(255)
+  locationDetail?: string;
 }

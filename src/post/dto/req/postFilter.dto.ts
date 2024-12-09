@@ -9,6 +9,7 @@ export class PostFilterDto {
     enumName: 'ItemCategory',
     description: 'Item category',
     example: ItemCategory.ELECTRONICS,
+    required: false,
   })
   @IsEnum(ItemCategory)
   @IsOptional()
@@ -19,6 +20,7 @@ export class PostFilterDto {
     enumName: 'PostType',
     description: 'Type of post (FOUND or LOST)',
     example: PostType.FOUND,
+    required: false,
   })
   @IsEnum(PostType)
   @IsOptional()
@@ -29,6 +31,7 @@ export class PostFilterDto {
     enumName: 'PostStatus',
     description: 'Post status',
     example: PostStatus.IN_PROGRESS,
+    required: false,
   })
   @IsEnum(PostStatus)
   @IsOptional()
@@ -36,8 +39,20 @@ export class PostFilterDto {
 
   @ApiProperty({
     type: Number,
+    description: 'Building Id',
+    example: 1,
+    required: false,
+  })
+  @Transform(({ value }) => parseInt(value), { toClassOnly: true })
+  @IsInt()
+  @IsOptional()
+  buildingId?: number;
+
+  @ApiProperty({
+    type: Number,
     description: 'Pagination cursor for next set of results',
     example: 0,
+    required: false,
   })
   @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
   @IsInt()
@@ -46,12 +61,13 @@ export class PostFilterDto {
 
   @ApiProperty({
     type: Number,
-    description: 'Number of posts to return (maximum 20)',
-    example: 10,
+    description: 'Number of posts to return (maximum 100)',
+    example: 20,
+    required: false,
   })
   @Type(() => Number)
   @IsInt()
   @IsOptional()
-  @Max(20)
+  @Max(100)
   take?: number;
 }
