@@ -8,5 +8,6 @@ import { BuildingRepository } from './building.repository';
   imports: [PrismaModule],
   providers: [BuildingService, BuildingRepository],
   controllers: [BuildingController],
+  exports: [BuildingService],
 })
 export class BuildingModule {}
