@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -19,14 +20,21 @@ export class CommentService {
     userUuid: string,
     createCommentDto: CreateCommentDto,
   ): Promise<CommentResponseDto> {
-    const { postId, parentId } = createCommentDto;
+    const { postId, parentId, type } = createCommentDto;
+
+    if (type === 'COMMENT' && parentId) {
+      throw new BadRequestException("COMMENT don't need parentId");
+    }
+    if (type === 'REPLY' && !parentId) {
+      throw new BadRequestException('REPLY need parentId');
+    }
 
     const post = await this.postService.getPostById(postId);
     if (!post) {
       throw new NotFoundException('Post not found');
     }
 
-    if (parentId) {
+    if (type === 'REPLY') {
       const parentComment =
         await this.commentRepository.getCommentById(parentId);
       if (!parentComment) {
