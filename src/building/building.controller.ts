@@ -84,7 +84,7 @@ export class BuildingController {
     description: 'Internal Server Error',
   })
   @Delete(':id')
-  async deletePost(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  async deleteBuilding(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.buildingService.deleteBuilding(id);
   }
 }
