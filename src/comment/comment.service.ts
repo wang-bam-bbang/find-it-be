@@ -50,6 +50,12 @@ export class CommentService {
   }
 
   async getPostComments(postId: number): Promise<CommentResponseDto[]> {
+    const post = this.postService.getPostById(postId);
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
     return this.commentRepository.getPostComments(postId);
   }
 
