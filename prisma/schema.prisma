@@ -62,22 +62,22 @@ model Post {
 
   authorId String    @db.Uuid
   author   User      @relation(fields: [authorId], references: [uuid])
-  Comment  Comment[]
+  comment  Comment[]
 
-  // buildingId     Int      @default(1)
-  // Building       Building @relation(fields: [buildingId], references: [id])
-  // locationDetail String? // 세부 위치
+  buildingId     Int      @default(2)
+  building       Building @relation(fields: [buildingId], references: [id])
+  locationDetail String? // 세부 위치
 
   @@map("post")
 }
 
 model Building {
   id     Int    @id @default(autoincrement())
-  name   String @unique() @db.VarChar(255)
-  enName String @db.VarChar(255)
-  gps    String @db.VarChar(255)
-  code   String @db.VarChar(50) // 건물 번호 e.g. E11
-  // posts  Post[]
+  name   String @unique() @db.VarChar(20)
+  enName String @db.VarChar(20)
+  gps    String @db.VarChar(30)
+  code   String @db.VarChar(4) // 건물 번호 e.g. E11
+  posts  Post[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
