@@ -13,7 +13,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
+import axios from 'axios';
+import FormData from 'form-data';
 import sharp from 'sharp';
 
 @Injectable()
@@ -53,7 +54,13 @@ export class ImageService {
   private async uploadImage(file: Express.Multer.File): Promise<string> {
     const key = `${Date.now()}-${Math.random().toString(36).substring(2)}${file.originalname}`;
 
-    const webpFile = await this.convertToWebp(file);
+    // OCR Masking
+    const maskedImageBuffer = await this.maskingImageWithFlask(file);
+
+    const webpFile = await this.convertToWebp({
+      ...file,
+      buffer: maskedImageBuffer,
+    });
 
     const command = new PutObjectCommand({
       Bucket: this.bucketName,
@@ -170,6 +177,42 @@ export class ImageService {
     } catch (error) {
       console.error('Error generating signed URLs:', error);
       throw new InternalServerErrorException('Failed to generate signed URLs');
+    }
+  }
+
+  /**
+   * AI feature 서버에 이미지를 보내서 OCR 마스킹 처리
+   * @param file Express.Multer.File
+   * @returns Buffer (마스킹된 이미지 데이터)
+   */
+  private async maskingImageWithFlask(
+    file: Express.Multer.File,
+  ): Promise<Buffer> {
+    const flaskApiUrl = this.configService.get<string>('FLASK_API_URL'); // Flask API URL
+    const flaskApiKey = this.configService.get<string>('FLASK_API_KEY'); // Flask API Key
+
+    try {
+      const formData = new FormData();
+      formData.append('image', file.buffer, file.originalname);
+
+      const response = await axios.post(
+        `${flaskApiUrl}/process_image`,
+        formData,
+        {
+          headers: {
+            'X-API-KEY': flaskApiKey,
+            ...formData.getHeaders(),
+          },
+          responseType: 'arraybuffer', // 이미지 데이터를 Buffer로 받기
+        },
+      );
+
+      return Buffer.from(response.data); // 마스킹된 이미지 데이터 반환
+    } catch (error) {
+      console.error('Error calling Flask API:', error.message);
+      throw new InternalServerErrorException(
+        'Failed to process image with Flask API',
+      );
     }
   }
 }
