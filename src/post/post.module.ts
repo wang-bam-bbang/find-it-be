@@ -7,6 +7,7 @@ import { PostService } from './post.service';
 import { PostRepository } from './post.repository';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { ImageModule } from 'src/image/image.module';
+import { BuildingModule } from 'src/building/building.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ImageModule } from 'src/image/image.module';
     UserModule,
     PrismaModule,
     ImageModule,
+    BuildingModule,
   ],
   providers: [PostService, PostRepository],
   controllers: [PostController],

@@ -36,7 +36,7 @@ export class PostController {
 
   @ApiOperation({
     summary: 'get post list',
-    description: 'get post list with filter query',
+    description: 'You can get post list with filter query.',
   })
   @ApiOkResponse({
     type: PostListDto,

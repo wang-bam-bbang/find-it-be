@@ -12,12 +12,20 @@ export class PostRepository {
   constructor(private prismaService: PrismaService) {}
 
   async findPostList(postFilterDto: PostFilterDto): Promise<PostResponseDto[]> {
-    const { category, type, status, cursor, take = 10 } = postFilterDto;
+    const {
+      category,
+      type,
+      status,
+      buildingId,
+      cursor,
+      take = 10,
+    } = postFilterDto;
 
     const where = {
       ...(category && { category }),
       ...(type && { type }),
       ...(status && { status }),
+      ...(buildingId && { buildingId }),
     };
 
     const postList = await this.prismaService.post.findMany({
@@ -32,6 +40,15 @@ export class PostRepository {
             name: true,
           },
         },
+        building: {
+          select: {
+            id: true,
+            name: true,
+            enName: true,
+            gps: true,
+            code: true,
+          },
+        },
       },
     });
 
@@ -41,7 +58,10 @@ export class PostRepository {
       title: post.title,
       description: post.description,
       images: post.images,
-      // location: post.location as string,
+
+      building: post.building,
+      locationDetail: post.locationDetail,
+
       category: post.category,
       status: post.status,
       author: post.author,
@@ -57,7 +77,15 @@ export class PostRepository {
     // const { type, title, description, images, location, category } =
     //   createPostDto;
 
-    const { type, title, description, images, category } = createPostDto;
+    const {
+      type,
+      title,
+      description,
+      images,
+      category,
+      buildingId,
+      locationDetail,
+    } = createPostDto;
 
     const post = await this.prismaService.post.create({
       data: {
@@ -66,11 +94,16 @@ export class PostRepository {
             uuid: userUuid,
           },
         },
+        building: {
+          connect: {
+            id: buildingId,
+          },
+        },
         type,
         title,
         description,
         images,
-        // location,
+        locationDetail,
         category,
         status: 'IN_PROGRESS',
       },
@@ -79,6 +112,15 @@ export class PostRepository {
           select: {
             uuid: true,
             name: true,
+          },
+        },
+        building: {
+          select: {
+            id: true,
+            name: true,
+            enName: true,
+            gps: true,
+            code: true,
           },
         },
       },
@@ -90,7 +132,10 @@ export class PostRepository {
       title: post.title,
       description: post.description,
       images: post.images,
-      // location: post.location as string,
+
+      building: post.building,
+      locationDetail: post.locationDetail,
+
       category: post.category,
       status: post.status,
       author: post.author,
@@ -112,6 +157,15 @@ export class PostRepository {
             name: true,
           },
         },
+        building: {
+          select: {
+            id: true,
+            name: true,
+            enName: true,
+            gps: true,
+            code: true,
+          },
+        },
       },
     });
 
@@ -121,7 +175,10 @@ export class PostRepository {
       title: post.title,
       description: post.description,
       images: post.images,
-      // location: post.location as string,
+
+      building: post.building,
+      locationDetail: post.locationDetail,
+
       category: post.category,
       status: post.status,
       author: post.author,
@@ -140,6 +197,15 @@ export class PostRepository {
             name: true,
           },
         },
+        building: {
+          select: {
+            id: true,
+            name: true,
+            enName: true,
+            gps: true,
+            code: true,
+          },
+        },
       },
     });
 
@@ -151,7 +217,10 @@ export class PostRepository {
       title: post.title,
       description: post.description,
       images: post.images,
-      // location: post.location as string, // 변환 추가
+
+      building: post.building,
+      locationDetail: post.locationDetail,
+
       category: post.category,
       status: post.status,
       author: post.author,
@@ -174,6 +243,15 @@ export class PostRepository {
             name: true,
           },
         },
+        building: {
+          select: {
+            id: true,
+            name: true,
+            enName: true,
+            gps: true,
+            code: true,
+          },
+        },
       },
     });
 
@@ -183,7 +261,10 @@ export class PostRepository {
       title: updatedPost.title,
       description: updatedPost.description,
       images: updatedPost.images,
-      // location: updatedPost.location as string,
+
+      building: updatedPost.building,
+      locationDetail: updatedPost.locationDetail,
+
       category: updatedPost.category,
       status: updatedPost.status,
       author: updatedPost.author,
