@@ -5,12 +5,12 @@ Project find_it {
 
 Enum item_category {
   ELECTRONICS  [note: '전자기기']
-  WALLET       [note: '지갑']
-  BAG          [note: '가방']
+  CARD         [note: '카드']
   CLOTHING     [note: '의류']
+  BAG          [note: '가방']
+  WALLET       [note: '지갑']
   ACCESSORIES  [note: '액세서리']
   DOCUMENT     [note: '서류']
-  CARD         [note: '카드']
   ETC          [note: '기타']
 }
 
@@ -35,7 +35,7 @@ Table users {
   name varchar [not null]
   created_at timestamp [not null, default: `now()`]
   updated_at timestamp [not null]
-
+  
   Note: '사용자 정보'
 }
 
@@ -45,19 +45,33 @@ Table posts {
   title varchar(255) [not null, note: '게시글 제목']
   description text [not null, note: '게시글 설명']
   images varchar[] [note: '이미지 URL 배열']
-  location varchar [not null, note: '발견/분실 장소']
   category item_category [not null, default: 'ETC', note: '아이템 카테고리']
   status post_status [not null, note: '게시글 상태']
   created_at timestamp [not null, default: `now()`]
   updated_at timestamp [not null]
   deleted_at timestamp [note: '게시글 삭제 일자']
   author_id uuid [ref: > users.uuid, not null, note: '작성자 UUID']
+  building_id int [ref: > buildings.id, not null, default: 2, note: '건물 ID']
+  location_detail varchar [note: '세부 위치']
 
   indexes {
     author_id
+    building_id
   }
 
   Note: '게시글 정보'
+}
+
+Table buildings {
+  id serial [pk, not null]
+  name varchar(20) [not null, unique, note: '건물명']
+  en_name varchar(20) [not null, note: '건물명 (영문)']
+  gps varchar(30) [not null, note: 'GPS 정보']
+  code varchar(4) [not null, note: '건물 코드 (예: E11)']
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null]
+
+  Note: '건물 정보'
 }
 
 Table comments {
