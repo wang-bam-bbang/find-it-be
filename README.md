@@ -24,8 +24,8 @@
 
 GIST 원내에서는 물건을 분실하는 일이 매일 발생하고 있습니다. 특히 아래 사진에서 볼 수 있는 것처럼 대학생 커뮤니티 서비스 `에브리타임`에는 매일 적게는 2-3회, 많게는 8-9회에 이르기까지 많은 분실물이 발생하고 있습니다.
 
-![everytime](./readme_asset/에타-1.png)
-![everytime](./readme_asset/에타-2.jpg)
+<img src='./readme_asset/에타-1.png' style="width: 49%; display: inline-block; margin-right: 1%;" alt="에타 이미지 1">
+<img src='./readme_asset/에타-2.jpg' style="width: 49%; display: inline-block;" alt="에타 이미지 2">
 
 자신의 물건을 분실한 사람(분실자)들은 주로 다음과 같은 3가지 경로를 통해 분실물을 찾게 됩니다.
 
@@ -167,12 +167,19 @@ FIND-IT 사용자는 분실물을 발견할 시 `발견자`로, 자신의 물품
 
    개인정보 Masking 기능을 위해 OCR Masking 모델을 사용해 이미지에 대한 Masking 기능을 제공하기 위해 Flask를 사용했습니다. 다른 팀원들이 개발에 관여했습니다. 관련 [레퍼지토리](https://github.com/wang-bam-bbang/find-it-ai)에서 확인하실 수 있습니다.
 
+### Flutter 화면 구성
+
+모바일앱 화면 구성은 다음과 같습니다.
+
+<img src='./readme_asset/flutter.png' style="height: 300px; display: inline-block; margin-right: -0.5%;" alt="모바일앱 이미지 1">
+<img src='./readme_asset/flutter-2.png' style="height: 300px; display: inline-block;" alt="모바일앱 이미지 2">
+
 ## 백엔드 주요 기능
 
 <details>
 <summary><strong>Prisma</strong></summary>
 
-FIND-IT 서비스는 `PostgreSQL`을 DB로 사용하며, ORM으로 `Prisma`를 사용합니다. 아래 사진은 FIND-IT 서비스의 `DB Schema`를 나타내며, [dbdocs](https://dbdocs.io/%EA%B9%80%EC%B2%A0%ED%9D%AC/find_it)를 통해 좀 더 자세한 내용을 확인할 수 있습니다.
+FIND-IT 서비스는 `PostgreSQL`을 DB로 사용하며, ORM으로 `Prisma`를 사용한다. 아래 사진은 FIND-IT 서비스의 `DB Schema`를 나타내며, [dbdocs](https://dbdocs.io/%EA%B9%80%EC%B2%A0%ED%9D%AC/find_it)를 통해 좀 더 자세한 내용을 확인할 수 있다.
 
 ![DB Schema](./readme_asset/db-schema.png)
 
@@ -185,24 +192,27 @@ FIND-IT 서비스는 `PostgreSQL`을 DB로 사용하며, ORM으로 `Prisma`를 �
 
 ### 주요 엔드포인트
 
-1. **로그인 URL 가져오기**:
+1. **GSA INFOTEAM IdP로그인 URL 가져오기**:
 
    - `GET /user/login`
    - IdP 로그인 URL을 반환
+   - 모바일앱에서 해당 URL을 사용해 로그인 진행
 
-2. **로그인 콜백**:
+2. **IdP 로그인 콜백**:
 
    - `GET /user/callback`
-   - IdP 인증 코드를 받아 JWT 토큰을 반환
+   - 로그인을 끝낸 사용자(모바일앱)으로부터 `IdP 인증 코드`를 받아 `IdP Service`로부터 `JWT 토큰`을 받고, 이를 사용자에게 반환
 
 3. **Access Token 갱신**:
 
    - `POST /user/refresh`
    - Refresh Token을 사용하여 Access Token 갱신
+   - `IdP Service`를 통해 이루어짐
 
 4. **사용자 정보 조회**:
    - `GET /user/info`
    - Access Token을 통해 사용자 정보 반환
+   - `IdP Service`를 통해 이루어짐
 
 </details>
 
@@ -216,16 +226,22 @@ FIND-IT 서비스는 `PostgreSQL`을 DB로 사용하며, ORM으로 `Prisma`를 �
 1. **게시물 리스트 조회**:
 
    - `GET /post/list`
-   - 필터 옵션을 통해 게시물 리스트 반환
+   - 여러 필터 옵션을 통해 게시물 리스트 조회
+   - 주요 필터 Input: 카테고리, 게시글 유형, 게시글 상태, 건물
+   - Cursor-based Pagination 적용
 
 2. **내 게시물 조회**:
 
    - `GET /post/my-posts`
-   - 사용자별 게시물 반환
+   - 사용자 본인 게시물 조회
 
 3. **게시물 생성**:
 
    - `POST /post`
+   - 주요 Input: Access Token, 게시글 유형(분실, 발견), 제목, 상세 설명, 이미지 key 리스트, 건물, 상세 위치, 분신물 카테고리
+   - 게시글 업로드는 1단계. 이미지 업로드 2단계. 게시글 업로드 과정으로 이루어져있다.
+   - 이미지 key 리스트는 1단계에서 반환된 이미지 key 리스트를 사용한다.
+   - 2단계에 도달하지 못한 이미지들은 S3 bucket의 Lifecycle Policy에 의해 삭제된다.
 
 4. **게시물 수정**:
 
@@ -233,6 +249,35 @@ FIND-IT 서비스는 `PostgreSQL`을 DB로 사용하며, ORM으로 `Prisma`를 �
 
 5. **게시물 삭제**:
    - `DELETE /post/:id`
+
+</details>
+
+---
+
+<details>
+<summary><strong>Image</strong></summary>
+
+### 주요 기능
+
+1. **이미지 업로드(API)**:
+
+   - `POST /image`
+   - 여러 개의 이미지를 S3에 업로드
+   - 업로드된 이미지의 key 리스트 반환
+
+2. **Presigned URL 생성(service)**:
+
+   - 이미지 key 리스트를 받아 GetObject 명령어에 대한 presigned-url 반환
+   - 1시간 유효
+
+3. **Image Masking(service)**:
+
+   - 이미지에 노출된 개인정보를 making한 이미지 반환하는 요청 전달
+   - Masking 기능이 있는 외부 서버에 요청을 전달하는 proxy 역할
+
+4. **이미지 검증(service)**:
+
+   - S3에 업로드된 이미지가 게시글 업르도에 사용될 경우, 해당 이미지의 `expiration` tag를 `false`로 수정
 
 </details>
 
@@ -247,11 +292,12 @@ FIND-IT 서비스는 `PostgreSQL`을 DB로 사용하며, ORM으로 `Prisma`를 �
 
    - `POST /comment`
    - 게시물에 댓글 생성
+   - 주요 Input: 댓글 내용, 댓글 유형(댓글, 대댓글), 게시글 Id, 부모 댓글 Id(optional)
 
 2. **댓글 리스트 조회**:
 
    - `GET /comment/:postId`
-   - 특정 게시물의 댓글 리스트 반환
+   - 특정 게시물의 댓글 리스트 조회
 
 3. **댓글 삭제**:
    - `DELETE /comment/:commentId`
@@ -291,7 +337,7 @@ FIND-IT 서비스는 `PostgreSQL`을 DB로 사용하며, ORM으로 `Prisma`를 �
 <details>
 <summary><strong>Swagger 문서화</strong></summary>
 
-Swagger를 사용하여 API 문서를 제공합니다.
+Swagger를 사용하여 API 문서를 제공한다.
 
 ### 주요 기능
 
@@ -324,6 +370,32 @@ Swagger API Docs 접근 경로: `/api/docs`
 
 ## 5. 회고
 
-1. 채팅 기능이 필요할지?
+### 채팅 기능을 개발하지 않은 이유
 
-2. Database를 EBS에 mount하지 않은 것(문제점)
+기존 기획에서는 채팅 기능을 개발할 예정이었다. 단순하게 생각했을 때, 물건을 찾고 찾아주는 과정에서 채팅 기능이 꼭 필요할 것으로 생각했다. 하지만 다음과 같은 이유로 대부분의 경우에는 채팅 기능이 필요하지 않다는 결론을 내렸다.
+
+a. 발견자의 입장에서, 분실물을 발견할 경우 분실 게시글에 분실물 발견 장소를 댓글로 남기거나, 발견 게시글을 업로드하고 나면, 그 이후에 발견자-분실자 사이의 대화는 불필요하다.
+
+b. 분실자의 입장에서, 자신의 분실물에 대한 바견 게시글을 발견할 경우, '감사인사' 외에 발견자-분실자 사이의 대화는 불필요하다.
+
+c. 설령 발견자-분실자 사이의 대화가 이루어진다고 할지라도, `대화의 지속성`이 매우 짧아 채팅 기능이 무의미하다.
+
+d. 댓글 기능이 발견자-분실자 사이의 모든 대화를 커버할 수 있다.
+
+위와 같은 이유로 댓글 기능으로도 채팅 기능을 구현함으로써 얻을 수 있는 이점(발견자-분실자간 대화)를 충분히 얻을 수 있다는 결론에 다달았으며, 기존 댓글 기능에 `대댓글` 기능을 추가하여 댓글 기능을 통한 대화 편의성을 높이고자 했다.
+
+### DB를 EBS에 연결하지 않은 것
+
+현재 PostgreSQL DB는 docker container의 내부 파일 시스템에 연결되어 있다. 이는 EC2 instance 자체 volume에 연결되어 있기 때문에, container가 종료(의도적이든 실수든)되면 DB의 data는 사라지게 된다.
+
+프로젝트를 진행하는 동안 EC2 instance가 종료해야하는 일이 발생하지 않아 별도의 문제는 없었으나, 만약 그러한 상황이 있었다면 DB의 data가 사라졌을 것이다.
+
+docker container의 volume을 EC2 instance 자체 volume에 연결하는 것이 아니라, EC2 instance에 mount된 EBS에 연결했어야 한다. docker container의 volume을 EBS에 연결한다면 설령 EC2 instance가 갑작스럽게 종료된다고 할지라도, DB의 data는 EBS에 그대로 보존되게 된다.
+
+이에 대한 배경 지식이 있었지만 초기에 조치를 취하지 않은 것이 문제이다.
+
+### 백엔드 개발 재밌다!
+
+프론트엔드 개발자로서는 여러 번 개발 프로젝트에 참여한 경험이 있지만, 백엔드 개발자로서는 처음이다. 백엔드 개발자의 진로를 택하기로 결심하고 나서 처음으로 진행한 프로젝트인데, 학기 중임에도 불구하고 나름 의미있는 백엔드 경험을 할 수 있었다. DB와 API 설계는 어떻게 해야하는지, 디자인 패턴이 왜 중요한지, 의존성 주입과 데코레이터가 무엇인지, DB migration이 왜 중요한지, 자동 배포가 왜 필요한지 등, 단순히 CS 전공 수업만으로는 알 수 없는 경험을 했다.
+
+한 가지 아쉬운 점은 백엔드 배포가 이뤄지긴 했지만, 모바일앱 등록을 하지 않아 실 사용자가 없었다는 점이다. 개발해둔 API endpoint들도 모두 사용되지는 못했다. 개개인이 이 프로젝트에 뜻이 있어서 팀으로 결성된 게 아니기 때문에, 프로젝트의 고도화는 이루어지기 어려웠다. 내 계획으로는 조만간 새로운 프로젝트를 시작해볼 생각인데, 그 때는 실제 배포와 운영까지 이루어지고, 최초 배포된 서비스에서 고도화까지 이루어지는 경험일 해볼 수 있기를 바란다.
